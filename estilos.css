@@ -206,3 +206,4 @@ main{padding:18px 16px}
 #v-mensual{margin-top:8px}
 @media (prefers-color-scheme:dark){:root:not([data-tema=claro]) .tipo-estacionamiento .v-chip,:root:not([data-tema=claro]) .tipo-otro .v-chip,:root:not([data-tema=claro]) .tipo-nafta .v-chip{background:#2a2f27;color:var(--texto)}}
 .v-dia{text-transform:none}
+.v-total-dia{color:var(--suave)}.v-total-dia b{color:var(--texto)}
