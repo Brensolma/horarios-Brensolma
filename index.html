@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Horarios BSM">
 <link rel="stylesheet" href="estilos.css">
 </head>
-<body>
+<body class="app">
 <header>
   <div class="marca"><img src="casa.png" alt=""><div><strong>Horarios Brensolma</strong><span id="hola"></span></div></div>
   <nav class="acciones-cab">
@@ -29,14 +29,17 @@
 
 <main>
   <section id="pantalla-cargando" class="cargando">
-    <img class="logo-grande solo-claro" src="logo-claro.png" alt="Brensolma">
-    <img class="logo-grande solo-oscuro" src="logo-oscuro.png" alt="Brensolma">
-    <p class="nota">Cargando…</p>
+    <div class="esqueleto" style="height:16px;width:45%"></div>
+    <div class="esqueleto" style="height:118px;margin-top:10px;border-radius:20px"></div>
+    <div class="esqueleto" style="height:84px;margin-top:16px;border-radius:16px"></div>
+    <div class="esqueleto" style="height:60px;margin-top:10px;border-radius:16px"></div>
   </section>
 
   <section id="pantalla-login" hidden>
-    <img class="logo-grande solo-claro" src="logo-claro.png" alt="Brensolma">
-    <img class="logo-grande solo-oscuro" src="logo-oscuro.png" alt="Brensolma">
+    <div class="login-hero">
+      <img class="logo-grande solo-claro" src="logo-claro.png" alt="Brensolma">
+      <img class="logo-grande solo-oscuro" src="logo-oscuro.png" alt="Brensolma">
+    </div>
     <h1>Ingresar</h1>
     <form id="form-login">
       <label id="campo-nombre" hidden>Nombre y apellido<input id="nombre" autocomplete="name"></label>
@@ -57,28 +60,32 @@
 
   <section id="pantalla-marcar" hidden>
     <p id="fecha-hoy" class="fecha"></p>
-    <p id="estado" class="estado"></p>
+    <div id="estado" class="estado-card"></div>
     <div id="botones"></div>
     <h2>Hoy</h2>
     <p id="sin-marcas" class="nota">Sin marcas todavía.</p>
-    <ol id="lista-hoy" class="lista"></ol>
+    <ol id="lista-hoy" class="timeline"></ol>
   </section>
 
   <section id="pantalla-viaticos" hidden>
-    <div class="v-cabecera">
-      <button id="v-anterior" type="button" class="chico" aria-label="Semana anterior">◀</button>
-      <h2 id="v-semana"></h2>
-      <button id="v-siguiente" type="button" class="chico" aria-label="Semana siguiente">▶</button>
+    <div class="v-resumen">
+      <div class="v-cabecera">
+        <button id="v-anterior" type="button" class="btn-redondo" aria-label="Semana anterior">&#8249;</button>
+        <div><small>Semana</small><h2 id="v-semana"></h2></div>
+        <button id="v-siguiente" type="button" class="btn-redondo" aria-label="Semana siguiente">&#8250;</button>
+      </div>
+      <div id="v-total" class="v-total"></div>
+      <div class="v-chips"><span>Almuerzos <b id="v-alm"></b></span><span>Otros <b id="v-otr"></b></span></div>
+      <small id="v-fotos" class="v-fotos"></small>
     </div>
-    <label class="marcar principal v-boton">Sacar foto del comprobante
-      <input id="v-foto" type="file" accept="image/*" capture="environment" hidden></label>
-    <div class="v-fila">
-      <label class="marcar secundario v-boton">De la galería
+    <div class="v-botones">
+      <label class="v-accion principal"><span class="ico"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3.5L9 5.5h6L16.5 8H20v11H4z"/><circle cx="12" cy="13.2" r="3.4"/></svg></span>Sacar foto
+        <input id="v-foto" type="file" accept="image/*" capture="environment" hidden></label>
+      <label class="v-accion"><span class="ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17.5 5-4.5 4 3.5 3-2.5 4 3.5"/></svg></span>Galería
         <input id="v-galeria" type="file" accept="image/*" hidden></label>
-      <button id="v-sin-foto" type="button" class="marcar secundario">Sin foto</button>
+      <button id="v-sin-foto" type="button" class="v-accion"><span class="ico"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg></span>Sin foto</button>
     </div>
-    <ol id="v-lista" class="lista v-lista"></ol>
-    <p id="v-total" class="v-total"></p>
+    <ol id="v-lista" class="v-lista"></ol>
     <button id="v-planilla" type="button" class="marcar secundario">Descargar planilla de la semana</button>
     <div id="v-mensual" hidden>
       <h2 id="v-mensual-titulo">Planilla mensual</h2>
