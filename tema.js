@@ -21,3 +21,19 @@
     });
   });
 })();
+
+// Botón redondo de la cabecera: alterna claro / oscuro.
+document.addEventListener("DOMContentLoaded", function () {
+  var b = document.getElementById("btn-tema");
+  if (!b) return;
+  b.addEventListener("click", function () {
+    var raiz = document.documentElement;
+    var oscuroAhora = raiz.getAttribute("data-tema") === "oscuro" ||
+      (!raiz.getAttribute("data-tema") && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    var t = oscuroAhora ? "claro" : "oscuro";
+    try { localStorage.setItem("tema", t); } catch (e) {}
+    raiz.setAttribute("data-tema", t);
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", t === "oscuro" ? "#1c211a" : "#ffffff");
+  });
+});

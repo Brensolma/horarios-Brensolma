@@ -60,6 +60,13 @@ service cloud.firestore {
       allow delete: if esAdmin() || (logueado() && resource.data.uid == request.auth.uid);
     }
 
+    // Foto de perfil (chica, en texto). Cada uno cambia la suya; la ven todos los logueados.
+    match /fotos/{uid} {
+      allow read: if logueado();
+      allow write: if logueado() && request.auth.uid == uid
+        && request.resource.data.img is string && request.resource.data.img.size() < 300000;
+    }
+
     match /marcas/{id} {
       allow read: if esAdmin() || (logueado() && resource.data.uid == request.auth.uid);
       // Administración puede cargar marcas olvidadas (quedan como manuales).

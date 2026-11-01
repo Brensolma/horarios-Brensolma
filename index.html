@@ -16,9 +16,12 @@
 <body>
 <header>
   <div class="marca"><img src="casa.png" alt=""><div><strong>Horarios Brensolma</strong><span id="hola"></span></div></div>
-  <nav>
-    <button id="btn-perfil" class="chico" type="button">Mi perfil</button>
-    <button id="btn-salir" class="chico" type="button" hidden>Salir</button>
+  <nav class="acciones-cab">
+    <button id="btn-tema" class="btn-redondo" type="button" aria-label="Cambiar a modo oscuro" title="Claro / oscuro">
+      <svg class="ico-luna" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" fill="currentColor"/></svg>
+      <svg class="ico-sol" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+    </button>
+    <button id="btn-perfil" class="avatar" type="button" hidden aria-label="Mi perfil"><img id="avatar-img" alt="" hidden><span id="avatar-ini"></span></button>
   </nav>
 </header>
 
@@ -88,20 +91,19 @@
   <section id="pantalla-perfil" hidden>
     <h1>Mi perfil</h1>
     <p id="estado-casa" class="nota"></p>
-    <h2>Apariencia</h2>
-    <div class="selector-tema" role="group" aria-label="Tema">
-      <button type="button" data-tema="auto">Automático</button>
-      <button type="button" data-tema="claro">☀️ Claro</button>
-      <button type="button" data-tema="oscuro">🌙 Oscuro</button>
+    <div class="perfil-foto">
+      <div class="avatar grande"><img id="perfil-img" alt="" hidden><span id="perfil-ini"></span></div>
+      <label class="chico">Cambiar foto<input id="perfil-archivo" type="file" accept="image/*" hidden></label>
     </div>
     <p class="nota">La ubicación solo se toma en el momento de cada marca. La app no te sigue durante el día.</p>
     <button id="btn-volver" class="marcar secundario" type="button">Volver</button>
+    <button id="btn-salir" class="link" type="button" hidden>Cerrar sesión</button>
   </section>
 </main>
 
 <nav id="pestanas" class="pestanas" hidden>
-  <button type="button" data-ir="pantalla-marcar"><span>⏱️</span>Horarios</button>
-  <button type="button" data-ir="pantalla-viaticos"><span>🧾</span>Viáticos</button>
+  <button type="button" data-ir="pantalla-marcar"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 2h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Horarios</button>
+  <button type="button" data-ir="pantalla-viaticos"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7h6M9 11h6M9 15h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Viáticos</button>
 </nav>
 
 <dialog id="dlg-preg">

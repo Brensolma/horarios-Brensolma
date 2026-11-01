@@ -85,3 +85,20 @@ body.con-pestanas main{padding-bottom:90px}
 .conf-fila{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--borde);font-size:15px}
 .conf-fila span{color:var(--suave)}.conf-fila b{text-align:left;font-weight:600}
 #preg-input{margin-bottom:12px}
+
+/* --- v2: avatar, botón de tema y menú flotante --- */
+.acciones-cab{display:flex;align-items:center;gap:8px}
+.btn-redondo{width:40px;height:40px;border-radius:50%;border:1px solid var(--borde);background:var(--carta);color:var(--texto);display:grid;place-items:center;padding:0}
+.btn-redondo .ico-sol{display:none}
+:root[data-tema=oscuro] .btn-redondo .ico-sol{display:block}:root[data-tema=oscuro] .btn-redondo .ico-luna{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-tema=claro]) .btn-redondo .ico-sol{display:block}:root:not([data-tema=claro]) .btn-redondo .ico-luna{display:none}}
+.avatar{width:40px;height:40px;border-radius:50%;border:2px solid var(--verde-marca);background:var(--verde);color:#fff;font-weight:700;font-size:15px;display:grid;place-items:center;padding:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.avatar.grande{width:96px;height:96px;font-size:34px;border-width:3px}
+.perfil-foto{display:flex;align-items:center;gap:16px;margin:4px 0 18px}
+.perfil-foto .chico{cursor:pointer;padding:8px 14px}
+#btn-salir.link{display:block;margin:6px auto 0;color:var(--rojo)}
+.pestanas{left:50%;right:auto;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(320px,calc(100% - 48px));border:1px solid var(--borde);border-radius:999px;padding:6px;gap:4px;background:var(--carta);box-shadow:0 8px 24px #0003}
+.pestanas button{border-radius:999px;padding:8px 0;flex-direction:row;justify-content:center;gap:6px;font-size:14px}
+.pestanas button[aria-pressed=true]{background:var(--verde);color:#fff}
+body.con-pestanas main{padding-bottom:110px}
