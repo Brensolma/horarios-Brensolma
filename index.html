@@ -77,6 +77,11 @@
     <ol id="v-lista" class="lista v-lista"></ol>
     <p id="v-total" class="v-total"></p>
     <button id="v-planilla" type="button" class="marcar secundario">Descargar planilla de la semana</button>
+    <div id="v-mensual" hidden>
+      <h2 id="v-mensual-titulo">Planilla mensual</h2>
+      <p id="v-mensual-resumen" class="nota"></p>
+      <button id="v-mensual-bajar" type="button" class="marcar secundario">Descargar planilla del mes</button>
+    </div>
     <p class="nota">Las fotos y la planilla se guardan solas en Dropbox. Las facturas en papel se siguen entregando como dice la política.</p>
   </section>
 
@@ -107,6 +112,19 @@
     <p id="preg-error" class="alerta" hidden></p>
     <button id="preg-ok" type="button" class="marcar principal">Siguiente</button>
     <button id="preg-cancelar" type="button" class="link">Cancelar</button>
+  </form>
+</dialog>
+
+<dialog id="dlg-odo">
+  <form method="dialog" onsubmit="return false">
+    <h2 id="odo-titulo">Foto del odómetro</h2>
+    <p class="nota">Sacale foto al tablero con los km totales (sin poner en cero) y que se vea el sticker con la patente.</p>
+    <label class="marcar principal v-boton">Sacar foto del odómetro
+      <input id="odo-foto" type="file" accept="image/*" capture="environment" hidden></label>
+    <label class="marcar secundario v-boton">Elegir de la galería
+      <input id="odo-galeria" type="file" accept="image/*" hidden></label>
+    <button id="odo-sin-auto" type="button" class="marcar secundario">Hoy no uso el auto</button>
+    <button id="odo-cancelar" type="button" class="link">Cancelar</button>
   </form>
 </dialog>
 

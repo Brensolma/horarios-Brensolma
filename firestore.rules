@@ -37,11 +37,25 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['nombre', 'email', 'estado', 'rol', 'creado'])
         && request.resource.data.estado == 'pendiente'
         && request.resource.data.rol == 'empleado';
-      // El empleado solo puede proponer la ubicación de su casa; el resto lo cambia administración.
-      allow update: if esAdmin()
-        || (logueado() && request.auth.uid == uid
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['casaPropuesta']));
+      // Solo administración cambia el perfil (estado, rol y la casa).
+      allow update: if esAdmin();
       allow delete: if esAdmin();
+    }
+
+    // Viáticos: cada uno carga y ve los suyos; administración ve todo.
+    match /gastos/{id} {
+      allow read: if esAdmin() || (logueado() && resource.data.uid == request.auth.uid);
+      allow create: if activo()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.tipo in ['almuerzo', 'estacionamiento', 'otro', 'nafta']
+        && request.resource.data.monto is number && request.resource.data.total is number
+        && request.resource.data.fecha is string && request.resource.data.lunes is string
+        && !('foto' in request.resource.data) && !('fotoUrl' in request.resource.data);
+      // La foto la agrega el servidor (con la sesión del empleado) después de subirla a Dropbox.
+      allow update: if esAdmin()
+        || (logueado() && resource.data.uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['foto', 'fotoUrl']));
+      allow delete: if esAdmin() || (logueado() && resource.data.uid == request.auth.uid);
     }
 
     match /marcas/{id} {
@@ -51,8 +65,8 @@ service cloud.firestore {
         || (activo()
             && request.resource.data.uid == request.auth.uid
             && request.resource.data.ts == request.time          // la hora la pone el servidor
-            && request.resource.data.tipo in ['salida_casa', 'llegada_trabajo', 'inicio', 'cambio', 'fin',
-                                               'salida_trabajo', 'llegada_casa']
+            && request.resource.data.tipo in ['salida_casa', 'no_salgo_casa', 'llegada_trabajo', 'inicio', 'cambio', 'fin',
+                                               'salida_trabajo', 'llegada_casa', 'no_voy_casa']
             && request.resource.data.lat is number && request.resource.data.lng is number
             && !('manual' in request.resource.data)
             && (!(request.resource.data.tipo in ['salida_casa', 'llegada_casa'])
