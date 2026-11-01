@@ -14,10 +14,12 @@ service cloud.firestore {
     // (caja de ±radio alrededor del punto) y con buena precisión de GPS.
     function enCasa(d) {
       let c = perfil().get('casa', null);
-      return c != null
-        && d.acc is number && d.acc <= 100
-        && math.abs(d.lat - c.lat) <= c.dLat
-        && math.abs(d.lng - c.lng) <= c.dLng;
+      // Administración puede habilitar a alguien a marcar casa desde cualquier lugar.
+      return perfil().get('salidaLibre', false) == true
+        || (c != null
+            && d.acc is number && d.acc <= 100
+            && math.abs(d.lat - c.lat) <= c.dLat
+            && math.abs(d.lng - c.lng) <= c.dLng);
     }
 
     match /config/{id} {
