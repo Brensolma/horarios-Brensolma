@@ -49,7 +49,7 @@ service cloud.firestore {
       allow read: if esAdmin() || (logueado() && resource.data.uid == request.auth.uid);
       allow create: if activo()
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.tipo in ['almuerzo', 'estacionamiento', 'otro', 'nafta']
+        && request.resource.data.tipo in ['almuerzo', 'estacionamiento', 'otro', 'nafta', 'sube']
         && request.resource.data.monto is number && request.resource.data.total is number
         && request.resource.data.fecha is string && request.resource.data.lunes is string
         && !('foto' in request.resource.data) && !('fotoUrl' in request.resource.data);
