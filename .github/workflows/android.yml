@@ -1,0 +1,60 @@
+# Arma la app de Android (APK) cada vez que cambia la carpeta android/ y la publica
+# en "Releases" del repo, para descargarla y mandarla a los técnicos.
+name: App Android
+
+on:
+  push:
+    paths: ["android/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Clave de firma
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/horarios.keystore"
+            echo "KEYSTORE_PATH=$RUNNER_TEMP/horarios.keystore" >> "$GITHUB_ENV"
+          else
+            mkdir -p ~/.android
+            keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey \
+              -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Armar APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: gradle -p android assembleRelease --no-daemon --stacktrace
+
+      - name: Huella de la firma (para assetlinks.json)
+        run: |
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner verify --print-certs "$APK" | tee firma.txt
+          cp "$APK" HorariosBSM.apk
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: App Android (última versión)
+          body: "Descargá HorariosBSM.apk e instalalo en el celular."
+          files: |
+            HorariosBSM.apk
+            firma.txt
+          make_latest: true
