@@ -19,5 +19,29 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Marcar horario",
+      "short_name": "Marcar",
+      "url": "./?accion=marcar",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Cargar ticket",
+      "short_name": "Ticket",
+      "url": "./?accion=ticket",
+      "icons": [
+        {
+          "src": "icono-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }

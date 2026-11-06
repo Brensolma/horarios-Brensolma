@@ -1,0 +1,45 @@
+plugins { id 'com.android.application' }
+
+// App de Android que abre la app web de horarios (Trusted Web Activity) y suma un widget.
+android {
+    namespace 'ar.com.brensolma.horarios'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'ar.com.brensolma.horarios'
+        minSdk 23
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        // Si en GitHub está cargada la clave de firma (secretos), se usa esa; si no, la de prueba.
+        release {
+            def ks = System.getenv('KEYSTORE_PATH')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('KEYSTORE_PASS')
+                keyAlias System.getenv('KEY_ALIAS') ?: 'horarios'
+                keyPassword System.getenv('KEYSTORE_PASS')
+            } else {
+                storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

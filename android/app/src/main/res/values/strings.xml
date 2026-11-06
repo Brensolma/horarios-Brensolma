@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Horarios BSM</string>
+    <string name="widget_nombre">Marcar horario</string>
+    <string name="widget_marcar">Marcar</string>
+    <string name="widget_ticket">Ticket</string>
+    <string name="widget_descripcion">Marcá tu horario o cargá un ticket con un toque</string>
+    <string name="asset_statements" translatable="false">[{\"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://horarios-brensolma.onrender.com\"}}]</string>
+</resources>
