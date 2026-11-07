@@ -1,4 +1,5 @@
 /* Panel de administración (independiente de la app de los técnicos). */
+[hidden]{display:none!important}
 :root{--verde:#4a8a12;--verde-marca:#78be20;--verde-suave:#eaf4df;--verde-oscuro:#2f5e0a;--ambar:#9a5d07;--ambar-suave:#fdf1dc;
   --rojo:#c0392b;--fondo:#f4f6f2;--carta:#fff;--texto:#2b2a27;--suave:#62666b;--borde:#dfe3dc;--linea:#eef0ec;--gris-suave:#eef0ec;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-tema=claro]){--fondo:#121511;--carta:#1c211a;--texto:#ecefe9;--suave:#a3aa9f;--borde:#2f372c;--linea:#262d24;
