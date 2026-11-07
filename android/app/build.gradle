@@ -8,8 +8,8 @@ android {
         applicationId 'ar.com.brensolma.horarios'
         minSdk 23
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode 2
+        versionName '1.1'
     }
     signingConfigs {
         // Si en GitHub está cargada la clave de firma (secretos), se usa esa; si no, la de prueba.

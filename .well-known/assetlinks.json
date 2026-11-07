@@ -1,0 +1,11 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "ar.com.brensolma.horarios",
+    "sha256_cert_fingerprints": [
+      "1C:13:3C:3C:56:A2:81:D0:10:1B:4D:1C:C6:4D:7D:EC:F3:3A:4C:16:3F:72:88:8A:68:A6:BE:63:0C:C1:26:BB",
+      "EF:FC:1F:22:9F:5D:A5:52:A6:80:47:3F:4A:A3:D2:7C:A8:3D:B7:1A:72:CF:E8:E3:95:06:D7:AE:E9:88:89:11"
+    ]
+  }
+}]
