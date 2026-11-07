@@ -7,96 +7,200 @@
 <meta name="theme-color" content="#ffffff">
 <script src="tema.js"></script>
 <link rel="icon" href="icono-192.png" type="image/png">
-<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<header>
-  <div class="marca"><img src="casa.png" alt=""><div><strong>Panel de horarios</strong><span>Brensolma · administración</span></div></div>
-  <nav><button id="btn-salir" class="chico" type="button" hidden>Salir</button></nav>
+<header class="cab">
+  <a class="marca" href="#/"><img src="casa.png" alt=""><div><strong>Panel de horarios</strong><span>Brensolma · administración</span></div></a>
+  <button id="btn-menu" class="btn-menu" type="button" aria-label="Menú" aria-expanded="false" hidden>
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h14M4 11h14M4 16h14"/></svg>
+  </button>
+  <nav id="menu" class="menu" hidden>
+    <a href="#/proyectos"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 6h5l2 2h7v9H3z"/></svg><div>Proyectos<small>Agregar, importar Excel, direcciones</small></div></a>
+    <a href="#/direcciones"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 18s6-5.3 6-10a6 6 0 1 0-12 0c0 4.7 6 10 6 10z"/><circle cx="10" cy="8" r="2"/></svg><div>Direcciones<small>Casas de los empleados y Brensolma</small></div></a>
+    <a href="#/reporte"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 17V9M8 17V4M13 17v-6M18 17V7"/></svg><div>Reporte general<small>Horas por proyecto y por persona</small></div></a>
+    <a href="#/viaticos"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 2h10v16l-2.5-1.5L10 18l-2.5-1.5L5 18z"/><path d="M8 7h4M8 10h4"/></svg><div>Viáticos de todos<small>Semana y planillas mensuales</small></div></a>
+    <a href="#/config"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="2.5"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3M4.3 4.3l2.1 2.1M13.6 13.6l2.1 2.1M4.3 15.7l2.1-2.1M13.6 6.4l2.1-2.1"/></svg><div>Configuración<small>Horas, radios, tema</small></div></a>
+    <hr>
+    <button id="btn-salir" type="button">Salir</button>
+  </nav>
 </header>
 <div id="aviso" class="aviso" hidden></div>
 
-<main class="ancho">
-  <div class="tabs" hidden>
-    <button class="btn" data-tab="reporte">📊 Reporte</button>
-    <button class="btn" data-tab="marcas">✏️ Correcciones</button>
-    <button class="btn" data-tab="empleados">👷 Empleados<span id="badge-emp"></span></button>
-    <button class="btn" data-tab="viaticos">🧾 Viáticos</button>
-    <button class="btn" data-tab="proyectos">📁 Proyectos</button>
-    <button class="btn" data-tab="config">⚙️ Configuración</button>
-  </div>
-
-  <section id="tab-login">
-    <img class="logo-grande solo-claro" style="margin-left:0" src="logo-claro.png" alt="Brensolma">
-    <img class="logo-grande solo-oscuro" style="margin-left:0" src="logo-oscuro.png" alt="Brensolma">
+<main>
+  <!-- Ingreso -->
+  <section id="v-login" class="vista angosta">
+    <img class="logo-grande solo-claro" src="logo-claro.png" alt="Brensolma">
+    <img class="logo-grande solo-oscuro" src="logo-oscuro.png" alt="Brensolma">
     <h1>Ingresar</h1>
-    <form id="form-login" style="max-width:380px">
-      <label>Mail<input id="email" type="email" required></label>
-      <label>Contraseña<input id="pass" type="password" required></label>
+    <form id="form-login">
+      <label>Mail<input id="email" type="email" autocomplete="username" required></label>
+      <label>Contraseña<input id="pass" type="password" autocomplete="current-password" required></label>
       <button class="btn prim" type="submit">Entrar</button>
     </form>
     <p class="nota">Solo cuentas con rol de Administración.</p>
   </section>
 
-  <section id="tab-reporte" hidden>
+  <!-- Inicio: empleados -->
+  <section id="v-empleados" class="vista" hidden>
+    <h1>Empleados</h1>
+    <p class="sub">Tocá un empleado para ver sus horarios, viáticos y datos.</p>
+    <div class="barra">
+      <input id="buscar-emp" class="buscar" type="search" placeholder="Buscar empleado">
+      <div class="filtros" role="group" aria-label="Filtro">
+        <button type="button" class="filtro" data-filtro="todos" aria-pressed="true">Todos</button>
+        <button type="button" class="filtro" data-filtro="trabajando" aria-pressed="false">Trabajando hoy</button>
+        <button type="button" class="filtro" data-filtro="pendientes" aria-pressed="false">Pendientes</button>
+      </div>
+    </div>
+    <div id="lista-emp"></div>
+  </section>
+
+  <!-- Un empleado -->
+  <section id="v-empleado" class="vista" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <div class="cab-emp"><div id="e-av" class="av grande"></div><div><h1 id="e-nombre"></h1><p id="e-sub" class="sub"></p></div></div>
+    <div class="tabs" role="tablist">
+      <button type="button" data-tab="resumen" aria-selected="true">Resumen</button>
+      <button type="button" data-tab="horarios" aria-selected="false">Horarios</button>
+      <button type="button" data-tab="viaticos" aria-selected="false">Viáticos</button>
+      <button type="button" data-tab="datos" aria-selected="false">Datos</button>
+    </div>
+
+    <div id="t-resumen" class="tab">
+      <div class="cols">
+        <div class="carta"><h3 id="r-mes-titulo">Este mes</h3><div id="r-numeros" class="numeros"></div>
+          <h3 class="sep">Hoy</h3><div id="r-hoy"></div></div>
+        <div class="carta"><h3>Viáticos</h3><div id="r-viaticos"></div>
+          <h3 class="sep">Datos</h3><div id="r-datos"></div></div>
+      </div>
+    </div>
+
+    <div id="t-horarios" class="tab" hidden>
+      <form id="form-e-jornadas" class="fila">
+        <label>Desde<input id="e-desde" type="date" required></label>
+        <label>Hasta<input id="e-hasta" type="date" required></label>
+        <button class="btn prim" type="submit">Ver</button>
+        <button class="btn" type="button" id="e-excel">Descargar Excel</button>
+      </form>
+      <div id="e-totales" class="numeros"></div>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Hs viaje a pagar</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Proyectos / observaciones</th></tr></thead>
+        <tbody id="e-jornadas"></tbody></table></div>
+
+      <h2>Marcas de un día</h2>
+      <form id="form-e-marcas" class="fila">
+        <label>Fecha<input id="e-fecha" type="date" required></label>
+        <button class="btn" type="submit">Ver marcas</button>
+      </form>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Hora</th><th>Marca</th><th>Ubicación</th><th></th></tr></thead>
+        <tbody id="e-marcas"></tbody></table></div>
+      <h2>Agregar una marca olvidada</h2>
+      <p class="nota">Se carga en la fecha de arriba. Queda registrado que fue cargada a mano y por qué.</p>
+      <form id="form-e-agregar" class="fila">
+        <label>Hora<input id="a-hora" type="time" required></label>
+        <label>Marca<select id="a-tipo"></select></label>
+        <label>Proyecto (si arrancó o cambió)<select id="a-proyecto"></select></label>
+        <label>Lugar (si llegó o salió)<input id="a-lugar"></label>
+        <label>Motivo<input id="a-motivo" placeholder="Ej. se quedó sin batería" required></label>
+        <button class="btn prim" type="submit">Agregar</button>
+      </form>
+    </div>
+
+    <div id="t-viaticos" class="tab" hidden>
+      <form id="form-e-semana" class="fila">
+        <label>Semana (cualquier día)<input id="e-semana" type="date" required></label>
+        <button class="btn prim" type="submit">Ver</button>
+        <button class="btn" type="button" id="e-bajar-semanal">Descargar planilla semanal</button>
+      </form>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Día</th><th>Tipo</th><th>Planilla</th><th>Monto</th><th>Proyecto</th><th>Descripción</th><th>Comprobante</th></tr></thead>
+        <tbody id="e-gastos"></tbody></table></div>
+      <h2>Planilla mensual</h2>
+      <form id="form-e-mes" class="fila">
+        <label>Mes<input id="e-mes" type="month" required></label>
+        <button class="btn prim" type="submit">Ver</button>
+        <button class="btn" type="button" id="e-bajar-mensual">Descargar planilla mensual</button>
+      </form>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Día</th><th>Tipo</th><th>Monto</th><th>Descripción</th><th>Comprobante</th></tr></thead>
+        <tbody id="e-gastos-mes"></tbody></table></div>
+    </div>
+
+    <div id="t-datos" class="tab" hidden>
+      <div class="carta angosta" id="e-datos"></div>
+    </div>
+  </section>
+
+  <!-- Menú: proyectos -->
+  <section id="v-proyectos" class="vista" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <h1>Proyectos</h1>
+    <form id="form-proyecto" class="fila">
+      <label>Proyecto (nº o nombre)<input id="p-nombre" required placeholder="20260303-1066"></label>
+      <label>Cliente<input id="p-cliente" placeholder="YPF"></label>
+      <button class="btn prim" type="submit">Agregar</button>
+    </form>
+    <p class="nota">¿Muchos de una vez? Subí un Excel con las columnas <b>Proyecto</b>, <b>Cliente</b> y, si querés, <b>Dirección</b> o <b>Coordenadas</b>. Los que ya existen se actualizan.</p>
+    <div class="fila">
+      <button type="button" class="btn" id="btn-importar">Importar Excel</button>
+      <button type="button" class="btn" id="btn-modelo">Bajar modelo</button>
+      <input type="file" id="archivo-proyectos" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+    <input id="buscar-proyectos" class="buscar" type="search" placeholder="Buscar proyecto o cliente">
+    <div class="scroll"><table class="tabla"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Dirección</th><th></th></tr></thead>
+      <tbody id="tabla-proyectos"></tbody></table></div>
+  </section>
+
+  <!-- Menú: direcciones -->
+  <section id="v-direcciones" class="vista" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <h1>Direcciones</h1>
+    <h2>Brensolma</h2>
+    <form id="form-brensolma" class="fila">
+      <label>Latitud<input id="c-lat" inputmode="decimal"></label>
+      <label>Longitud<input id="c-lng" inputmode="decimal"></label>
+      <button type="button" class="btn" id="btn-ubic-bsm">Usar mi ubicación (estando en Brensolma)</button>
+      <button class="btn prim" type="submit">Guardar</button>
+    </form>
+    <p class="nota" id="bsm-mapa"></p>
+    <h2>Casas de los empleados</h2>
+    <p class="nota">Solo administración puede cargar o cambiar la casa de cada uno.</p>
+    <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Casa</th><th></th></tr></thead>
+      <tbody id="tabla-casas"></tbody></table></div>
+  </section>
+
+  <!-- Menú: reporte general -->
+  <section id="v-reporte" class="vista" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <h1>Reporte general</h1>
     <form id="form-reporte" class="fila">
       <label>Desde<input id="desde" type="date" required></label>
       <label>Hasta<input id="hasta" type="date" required></label>
-      <label>Empleado<select id="r-empleado" class="sel-empleado" data-todos></select></label>
+      <label>Empleado<select id="r-empleado"></select></label>
       <button class="btn prim" type="submit">Ver</button>
-      <button class="btn" type="button" id="btn-excel">⬇️ Excel</button>
+      <button class="btn" type="button" id="btn-excel">Descargar Excel</button>
     </form>
     <div id="resultado" hidden>
       <p id="sin-datos" class="nota" hidden>No hay marcas en ese período.</p>
-      <h2>Jornadas</h2>
-      <div class="scroll"><table class="tabla">
-        <thead><tr><th>Fecha</th><th>Empleado</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Hs viaje a pagar</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Proyectos / observaciones</th></tr></thead>
-        <tbody id="tabla-jornadas"></tbody></table></div>
       <h2>Horas hombre por proyecto</h2>
       <div class="scroll"><table class="tabla"><thead><tr><th>Proyecto</th><th>Total</th><th>Por persona</th></tr></thead>
         <tbody id="tabla-proyectos-horas"></tbody></table></div>
       <h2>Totales por empleado</h2>
       <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Días</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Viaje total</th><th>Hs viaje a pagar</th></tr></thead>
         <tbody id="tabla-empleados-tot"></tbody></table></div>
+      <h2>Jornadas</h2>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Empleado</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Hs viaje a pagar</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Proyectos / observaciones</th></tr></thead>
+        <tbody id="tabla-jornadas"></tbody></table></div>
     </div>
   </section>
 
-  <section id="tab-marcas" hidden>
-    <form id="form-buscar-marcas" class="fila">
-      <label>Fecha<input id="m-fecha" type="date" required></label>
-      <label>Empleado<select id="m-empleado" class="sel-empleado" data-todos></select></label>
-      <button class="btn prim" type="submit">Ver marcas</button>
-    </form>
-    <p id="sin-marcas" class="nota" hidden>Sin marcas.</p>
-    <div class="scroll"><table class="tabla"><thead><tr><th>Hora</th><th>Empleado</th><th>Marca</th><th>Ubicación</th><th></th></tr></thead>
-      <tbody id="tabla-marcas"></tbody></table></div>
-    <h2>Agregar una marca olvidada</h2>
-    <p class="nota">Usa la fecha y el empleado de arriba. Queda registrado que fue cargada a mano y por qué.</p>
-    <form id="form-agregar-marca" class="fila">
-      <label>Hora<input id="m-hora" type="time" required></label>
-      <label>Marca<select id="m-tipo">
-        <option value="salida_casa">🏠 Salió de casa</option><option value="llegada_trabajo">📍 Llegó al trabajo</option>
-        <option value="inicio">🔧 Arrancó a trabajar</option><option value="cambio">🔁 Cambió de proyecto</option><option value="fin">✅ Terminó de trabajar</option>
-        <option value="salida_trabajo">🚗 Salió del trabajo</option><option value="llegada_casa">🏠 Llegó a casa</option><option value="no_voy_casa">🚫 No volvió a casa</option></select></label>
-      <label>Proyecto (si arrancó o cambió)<select id="m-proyecto"></select></label>
-      <label>Lugar (si llegó o salió)<input id="m-lugar"></label>
-      <label>Motivo<input id="m-motivo" placeholder="Ej. se quedó sin batería" required></label>
-      <button class="btn prim" type="submit">Agregar</button>
-    </form>
-  </section>
-
-  <section id="tab-empleados" hidden>
-    <p class="nota">Los empleados se registran solos desde la app. Acá los activás y les cargás la dirección de su casa (solo administración puede cargarla o cambiarla).</p>
-    <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Estado</th><th>Casa</th><th>DNI (planilla)</th><th>Paga mesas a cuenta</th><th>Planillas</th><th>Rol</th></tr></thead>
-      <tbody id="tabla-empleados"></tbody></table></div>
-  </section>
-
-  <section id="tab-viaticos" hidden>
+  <!-- Menú: viáticos de todos -->
+  <section id="v-viaticos" class="vista" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <h1>Viáticos de todos</h1>
     <form id="form-viaticos" class="fila">
       <label>Semana (cualquier día)<input id="v-fecha" type="date" required></label>
       <button class="btn prim" type="submit">Ver</button>
     </form>
-    <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Almuerzos</th><th>Otros</th><th>Total</th><th>Comprobantes</th><th></th></tr></thead>
+    <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Almuerzos</th><th>Estacionamiento</th><th>Total semanal</th><th>Comprobantes</th><th></th></tr></thead>
       <tbody id="tabla-viaticos"></tbody></table></div>
     <h2>Planillas mensuales</h2>
     <form id="form-mensuales" class="fila">
@@ -106,41 +210,26 @@
     <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Planilla</th><th></th></tr></thead>
       <tbody id="tabla-mensuales"></tbody></table></div>
     <h2>Detalle de la semana</h2>
-    <div class="scroll"><table class="tabla"><thead><tr><th>Día</th><th>Empleado</th><th>Tipo</th><th>Planilla</th><th>Ticket</th><th>Proyecto</th><th>Descripción</th><th>Foto</th></tr></thead>
+    <div class="scroll"><table class="tabla"><thead><tr><th>Día</th><th>Empleado</th><th>Tipo</th><th>Planilla</th><th>Monto</th><th>Proyecto</th><th>Descripción</th><th>Comprobante</th></tr></thead>
       <tbody id="tabla-viaticos-det"></tbody></table></div>
   </section>
 
-  <section id="tab-proyectos" hidden>
-    <form id="form-proyecto" class="fila">
-      <label>Proyecto (nº o nombre)<input id="p-nombre" required placeholder="P-2045"></label>
-      <label>Cliente<input id="p-cliente" placeholder="YPF"></label>
-      <button class="btn prim" type="submit">Agregar</button>
-    </form>
-    <p class="nota">¿Muchos de una vez? Subí un Excel con las columnas <b>Proyecto</b>, <b>Cliente</b> y, si querés, <b>Dirección</b> o <b>Coordenadas</b>.
-      Los que ya existen se actualizan.
-      <button type="button" class="btn peq" id="btn-importar">📥 Importar Excel</button>
-      <button type="button" class="btn peq" id="btn-modelo">Bajar modelo</button>
-      <input type="file" id="archivo-proyectos" accept=".xlsx,.xls,.csv" hidden></p>
-    <input id="buscar-proyectos" type="search" placeholder="🔎 Buscar proyecto o cliente…" style="max-width:420px;margin-bottom:10px">
-    <div class="scroll"><table class="tabla"><thead><tr><th>Proyecto</th><th>Cliente</th><th>Dirección</th><th></th></tr></thead>
-      <tbody id="tabla-proyectos"></tbody></table></div>
-  </section>
-
-  <section id="tab-config" hidden>
+  <!-- Menú: configuración -->
+  <section id="v-config" class="vista angosta" hidden>
+    <a class="volver" href="#/">‹ Empleados</a>
+    <h1>Configuración</h1>
     <h2>Apariencia (en esta compu)</h2>
-    <div class="selector-tema" style="max-width:420px" role="group" aria-label="Tema">
+    <div class="selector-tema" role="group" aria-label="Tema">
       <button type="button" data-tema="auto">Automático</button>
-      <button type="button" data-tema="claro">☀️ Claro</button>
-      <button type="button" data-tema="oscuro">🌙 Oscuro</button>
+      <button type="button" data-tema="claro">Claro</button>
+      <button type="button" data-tema="oscuro">Oscuro</button>
     </div>
-    <form id="form-config" style="max-width:520px">
-      <h2>Brensolma</h2>
-      <div class="fila"><label>Latitud<input id="c-lat" inputmode="decimal"></label><label>Longitud<input id="c-lng" inputmode="decimal"></label></div>
-      <p><button type="button" class="btn" id="btn-ubic-bsm">📍 Usar mi ubicación actual (estando en Brensolma)</button></p>
+    <form id="form-config">
+      <h2>Ubicación</h2>
       <label>Radio de Brensolma (m)<input id="c-radioBrensolmaM" type="number"></label>
       <label>Radio de la casa (m)<input id="c-radioCasaM" type="number"></label>
       <h2>Horas</h2>
-      <label>Jornada normal con almuerzo incluido (min) — lo que pase es extra<input id="c-jornadaMin" type="number"></label>
+      <label>Jornada normal con almuerzo incluido (min). Lo que pase es extra<input id="c-jornadaMin" type="number"></label>
       <label>Almuerzo que se descuenta de las horas trabajadas (min)<input id="c-almuerzoMin" type="number"></label>
       <label>Viaje incluido en el sueldo por día (min)<input id="c-viajeIncluidoMin" type="number"></label>
       <label>El excedente de viaje se paga cada (min)<input id="c-bloqueViajeMin" type="number"></label>
@@ -150,6 +239,7 @@
     </form>
   </section>
 </main>
+
 <dialog id="dlg-casa">
   <h2 id="casa-titulo">Casa</h2>
   <p class="nota">Escribí la dirección (calle, número y localidad) o pegá las coordenadas de Google Maps (mantené apretado sobre la casa y copiá los números).</p>
@@ -160,7 +250,7 @@
   <div id="casa-resultados"></div>
   <p class="nota">Abrí "ver en el mapa" y revisá que el punto caiga en el lugar correcto. Si queda corrido, pegá las coordenadas exactas.</p>
   <div class="fila">
-    <button id="casa-guardar" type="button" class="btn prim" disabled>Guardar casa</button>
+    <button id="casa-guardar" type="button" class="btn prim" disabled>Guardar</button>
     <button id="casa-cancelar" type="button" class="btn">Cancelar</button>
   </div>
 </dialog>
