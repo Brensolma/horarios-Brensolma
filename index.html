@@ -130,6 +130,7 @@
   <form method="dialog" onsubmit="return false">
     <h2 id="odo-titulo">Foto del odómetro</h2>
     <p class="nota">Sacale foto al tablero con los km totales (sin poner en cero) y que se vea el sticker con la patente.</p>
+    <p id="odo-error" class="alerta" role="alert" hidden>Esa foto no es de recién. Sacala ahora con la cámara.</p>
     <label class="marcar principal v-boton">Sacar foto del odómetro
       <input id="odo-foto" type="file" accept="image/*" capture="environment" hidden></label>
     <button id="odo-sin-auto" type="button" class="marcar secundario">Hoy no uso el auto</button>
