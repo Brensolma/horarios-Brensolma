@@ -110,3 +110,4 @@ dialog h2{margin-top:0}
 }
 #e-totales div{background:var(--carta);border:1px solid var(--borde)}
 .campo .fila{margin:0;align-items:center}
+.campo .fila label{display:block;color:var(--suave);font-size:13px;margin:0}

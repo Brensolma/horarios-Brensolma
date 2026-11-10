@@ -61,6 +61,11 @@ let actual = null;          // empleado abierto
 let filtro = "todos";
 let ultimoReporte = null, ultimoEmpleado = null;
 let listo = false;          // sesión de administración confirmada
+// Configuración de cálculo de cada persona (jornada y beneficio propios).
+const cfgDe = (uid) => {
+  const e = empleados.find((x) => x.uid === uid) || {};
+  return { ...cfg, jornadaMin: e.jornadaMin || cfg.jornadaMin, beneficioMin: e.beneficioMin || 0 };
+};
 const nombreDe = (uid, x) => empleados.find((e) => e.uid === uid)?.nombre || x?.nombre || uid;
 
 // ---------------------------------------------------------------- ingreso
@@ -143,7 +148,7 @@ function jornadas(marcas) {
   for (const m of marcas) (porDia[`${m.uid}|${m.fecha}`] ||= []).push(m);
   return Object.entries(porDia).map(([k, ms]) => {
     const [uid, fecha] = k.split("|");
-    return { uid, nombre: nombreDe(uid, ms[0]), fecha, ...calcularJornada(ms, cfg) };
+    return { uid, nombre: nombreDe(uid, ms[0]), fecha, ...calcularJornada(ms, cfgDe(uid)) };
   }).sort((a, b) => a.fecha.localeCompare(b.fecha) || a.nombre.localeCompare(b.nombre));
 }
 async function guardarEmpleado(e, cambios) {
@@ -260,9 +265,10 @@ async function renderResumen() {
   const suma = (k) => js.reduce((s, j) => s + j[k], 0);
   $("#r-numeros").replaceChildren(
     el("div", {}, el("b", {}, String(js.length)), el("small", {}, "Días con marcas")),
-    el("div", {}, el("b", {}, horasTxt(suma("trabajoMin"))), el("small", {}, "Trabajadas")),
-    el("div", {}, el("b", {}, horasTxt(suma("extraMin"))), el("small", {}, "Extra")),
-    el("div", {}, el("b", {}, `${suma("horasViajeExtra").toLocaleString("es-AR")} h`), el("small", {}, "Viaje a pagar")));
+    el("div", {}, el("b", {}, horasTxt(suma("presenciaMin"))), el("small", {}, "Trabajadas")),
+    el("div", {}, el("b", {}, horasTxt(suma("extraMin"))), el("small", {}, "Extras al 50%")),
+    el("div", {}, el("b", {}, `${suma("horasViajeExtra").toLocaleString("es-AR")} h`), el("small", {}, "Adic. por viaje")),
+    el("div", {}, el("b", {}, `${suma("noTrabajadas").toLocaleString("es-AR")} h`), el("small", {}, "No trabajadas")));
   const deHoy = ms.filter((m) => m.fecha === hoy).sort((a, b) => a.ts - b.ts);
   $("#r-hoy").replaceChildren(deHoy.length
     ? el("table", { class: "lista-hoy" }, deHoy.map((m) => el("tr", {}, el("td", {}, hora(m.ts)),
@@ -295,19 +301,21 @@ async function verJornadas() {
   const suma = (k) => js.reduce((s, j) => s + j[k], 0);
   $("#e-totales").replaceChildren(
     el("div", {}, el("b", {}, String(js.length)), el("small", {}, "Días")),
-    el("div", {}, el("b", {}, horasTxt(suma("trabajoMin"))), el("small", {}, "Trabajadas")),
-    el("div", {}, el("b", {}, horasTxt(suma("extraMin"))), el("small", {}, "Extra")),
+    el("div", {}, el("b", {}, horasTxt(suma("presenciaMin"))), el("small", {}, "Trabajadas")),
+    el("div", {}, el("b", {}, horasTxt(suma("extraMin"))), el("small", {}, "Extras al 50%")),
+    el("div", {}, el("b", {}, `${suma("noTrabajadas").toLocaleString("es-AR")} h`), el("small", {}, "No trabajadas")),
     el("div", {}, el("b", {}, hhmm(suma("viajeMin"))), el("small", {}, "Viaje total")),
-    el("div", {}, el("b", {}, `${suma("horasViajeExtra").toLocaleString("es-AR")} h`), el("small", {}, "Viaje a pagar")));
+    el("div", {}, el("b", {}, `${suma("horasViajeExtra").toLocaleString("es-AR")} h`), el("small", {}, "Adic. por viaje")));
   $("#e-jornadas").replaceChildren(...(js.length ? js.map((j) => filaJornada(j, false))
-    : [el("tr", {}, el("td", { colspan: "10" }, "No hay marcas en ese período."))]));
+    : [el("tr", {}, el("td", { colspan: "11" }, "No hay marcas en ese período."))]));
 }
 function filaJornada(j, conNombre) {
   return el("tr", {}, el("td", {}, ddmm(j.fecha)), conNombre ? el("td", {}, j.nombre) : null,
     el("td", {}, hora(j.salidaCasa)), el("td", {}, hora(j.llegadaTrabajo), el("br"), el("small", {}, j.lugar)),
     el("td", {}, hora(j.salidaTrabajo), el("br"), el("small", {}, j.lugarSalida)), el("td", {}, hora(j.llegadaCasa)),
     el("td", {}, hhmm(j.viajeMin)), el("td", {}, j.horasViajeExtra ? `${j.horasViajeExtra} h` : "—"),
-    el("td", {}, hhmm(j.trabajoMin)), el("td", {}, j.extraMin ? hhmm(j.extraMin) : "—"),
+    el("td", {}, hhmm(j.presenciaMin)), el("td", {}, j.extraMin ? `${j.extraMin / 60} h` : "—"),
+    el("td", {}, j.noTrabajadas ? `${j.noTrabajadas} h` : "—"),
     el("td", {}, Object.entries(j.porProyecto).map(([p, m]) => el("div", {}, `${p}: ${hhmm(m)}`)),
       j.avisos.map((a) => el("div", { class: "alerta" }, a))));
 }
@@ -322,8 +330,8 @@ const filaExcel = (n) => ({
   Fecha: ddmm(n.fecha), Empleado: n.nombre, "Salió de casa": hora(n.salidaCasa), "Llegó al trabajo": hora(n.llegadaTrabajo),
   "Lugar de llegada": n.lugar, "Salió del trabajo": hora(n.salidaTrabajo), "Lugar de salida": n.lugarSalida, "Llegó a casa": hora(n.llegadaCasa),
   "Viaje ida (min)": n.idaMin, "Viaje vuelta (min)": n.vueltaMin, "Viaje total (min)": n.viajeMin, "Excedente viaje (min)": n.viajeExcesoMin,
-  "Horas de viaje a pagar": n.horasViajeExtra, "Arranco a Terminé (h)": horas(n.presenciaMin), "Almuerzo (h)": horas(n.almuerzoMin),
-  "Horas trabajadas (sin almuerzo)": horas(n.trabajoMin), "Horas extra": horas(n.extraMin),
+  "Horas adicionales por viaje": n.horasViajeExtra, "Arranco a Terminé (h)": horas(n.presenciaMin), "Almuerzo (h)": horas(n.almuerzoMin),
+  "Horas trabajadas (sin almuerzo)": horas(n.trabajoMin), "Horas extra al 50%": horas(n.extraMin), "Horas no trabajadas": n.noTrabajadas,
   Proyectos: Object.entries(n.porProyecto).map(([p, m]) => `${p} (${horas(m)} h)`).join("; "), Observaciones: n.avisos.join("; "),
 });
 
@@ -407,9 +415,12 @@ async function descargar(ruta, campos, uid, porDefecto) {
   }
   const nombre = (r.headers.get("Content-Disposition") || "").match(/filename="(.+)"/)?.[1] || porDefecto;
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(await r.blob()); a.download = `${nombreDe(uid)} - ${nombre}`; a.click();
+  a.href = URL.createObjectURL(await r.blob()); a.download = uid ? `${nombreDe(uid)} - ${nombre}` : nombre; a.click();
   aviso("Planilla descargada.", "ok");
 }
+const bajarAgenda = (desde, hasta, uid = "") => descargar("/agenda", { desde, hasta }, uid, "Agenda horarios.xlsx");
+$("#btn-agenda").addEventListener("click", () => intentar(() => bajarAgenda($("#desde").value, $("#hasta").value)));
+$("#e-agenda").addEventListener("click", () => intentar(() => bajarAgenda($("#e-desde").value, $("#e-hasta").value, actual.uid)));
 const bajarSemanal = (uid, lunes) => descargar("/planilla", { lunes }, uid, "Planilla semanal.xlsx");
 const bajarMensual = (uid, mes) => descargar("/planilla_mensual", { mes }, uid, "Planilla mensual.xlsx");
 
@@ -432,6 +443,18 @@ function renderDatos() {
     el("div", { class: "campo" }, el("span", {}, "DNI (va en las planillas)"),
       el("input", { value: e.dni || "", inputmode: "numeric", placeholder: "DNI",
         onchange: (ev) => intentar(() => guardarEmpleado(e, { dni: ev.target.value.replace(/\D/g, "") })) })),
+    el("div", { class: "campo" }, el("span", {}, "Jornada"),
+      el("div", { class: "fila" },
+        el("label", {}, "Horas por día (almuerzo incluido)", el("input", { type: "number", step: "0.5", min: "1", max: "12",
+          value: (e.jornadaMin || cfg.jornadaMin) / 60,
+          onchange: (ev) => intentar(async () => {
+            const h = parseFloat(ev.target.value);
+            if (!(h > 0 && h <= 12)) throw new Error("Revisá las horas de jornada.");
+            await guardarEmpleado(e, { jornadaMin: Math.round(h * 60) });
+          }) })),
+        el("label", {}, "Beneficio (minutos por día)", el("input", { type: "number", step: "5", min: "0", max: "120",
+          value: e.beneficioMin || 0,
+          onchange: (ev) => intentar(() => guardarEmpleado(e, { beneficioMin: Math.max(0, parseInt(ev.target.value, 10) || 0) })) })))),
     el("div", { class: "campo" }, el("span", {}, "Planillas"),
       el("select", { onchange: (ev) => guardarPlanillas({ mensual: ev.target.value }) },
         Object.entries(PLANILLAS).map(([k, t]) => el("option", { value: k, selected: p.mensual === k }, t))),
@@ -614,15 +637,15 @@ async function reporte() {
       porProyecto[p] ||= { total: 0, personas: {} };
       porProyecto[p].total += m; porProyecto[p].personas[j.nombre] = (porProyecto[p].personas[j.nombre] || 0) + m;
     }
-    const t = (porEmpleado[j.nombre] ||= { dias: 0, trabajo: 0, extra: 0, viaje: 0, hViaje: 0 });
-    t.dias++; t.trabajo += j.trabajoMin; t.extra += j.extraMin; t.viaje += j.viajeMin; t.hViaje += j.horasViajeExtra;
+    const t = (porEmpleado[j.nombre] ||= { dias: 0, trabajo: 0, extra: 0, viaje: 0, hViaje: 0, noTrab: 0 });
+    t.dias++; t.trabajo += j.presenciaMin; t.extra += j.extraMin; t.viaje += j.viajeMin; t.hViaje += j.horasViajeExtra; t.noTrab += j.noTrabajadas;
   }
   ultimoReporte = { desde, hasta, marcas, js, porProyecto, porEmpleado };
   $("#tabla-jornadas").replaceChildren(...js.map((j) => filaJornada(j, true)));
   $("#tabla-proyectos-horas").replaceChildren(...Object.entries(porProyecto).sort((a, b) => b[1].total - a[1].total).map(([p, x]) =>
     el("tr", {}, el("td", {}, p), el("td", {}, horasTxt(x.total)), el("td", {}, Object.entries(x.personas).map(([n, m]) => `${n} ${horas(m)} h`).join(" · ")))));
   $("#tabla-empleados-tot").replaceChildren(...Object.entries(porEmpleado).map(([n, t]) => el("tr", {}, el("td", {}, n), el("td", {}, t.dias),
-    el("td", {}, horasTxt(t.trabajo)), el("td", {}, horasTxt(t.extra)), el("td", {}, hhmm(t.viaje)), el("td", {}, `${t.hViaje} h`))));
+    el("td", {}, horasTxt(t.trabajo)), el("td", {}, horasTxt(t.extra)), el("td", {}, hhmm(t.viaje)), el("td", {}, `${t.hViaje} h`), el("td", {}, `${t.noTrab} h`))));
   $("#resultado").hidden = false; $("#sin-datos").hidden = js.length > 0;
 }
 $("#btn-excel").addEventListener("click", () => intentar(async () => {

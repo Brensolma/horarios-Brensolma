@@ -30,10 +30,12 @@ export function cajaRadio(lat, radioM) {
   return { dLat: radioM / 111320, dLng: radioM / (111320 * Math.cos((lat * Math.PI) / 180)) };
 }
 
-function viajeAPagar(viajeMin, c) {
-  const exceso = Math.max(0, viajeMin - c.viajeIncluidoMin);
-  const bloques = c.redondeoBloque === "arriba" ? Math.ceil(exceso / c.bloqueViajeMin) : Math.floor(exceso / c.bloqueViajeMin);
-  return { excesoMin: exceso, horas: bloques * c.horasPorBloque };
+// Medias horas: de cada hora sobrante, desde 25 min suma 0,5 h y desde 55 min, 1 h
+// (hoja "Procedimiento Registro de hs" de la agenda de Claudia).
+export function redondeo(min) {
+  if (!(min > 0)) return 0;
+  const h = Math.floor(Math.round(min) / 60), r = Math.round(min) % 60;
+  return h + (r >= 55 ? 1 : r >= 25 ? 0.5 : 0);
 }
 
 const tramo = (m, hasta) => ({
@@ -41,8 +43,15 @@ const tramo = (m, hasta) => ({
   desde: m.t, hasta, min: Math.round((hasta - m.t) / 60000),
 });
 
+// c puede traer jornadaMin y beneficioMin propios de cada empleado.
 export function calcularJornada(marcas, c = CONFIG_DEFECTO) {
   const ms = [...marcas].map((m) => ({ ...m, t: +new Date(m.ts) })).sort((a, b) => a.t - b.t);
+  // En el depósito no se cuentan los minutos antes de las 8:00.
+  const enDeposito = ms.find((m) => m.tipo === "llegada_trabajo")?.lugar === "Brensolma";
+  for (const m of ms) if (enDeposito && (m.tipo === "inicio" || m.tipo === "cambio")) {
+    const ocho = new Date(m.t); ocho.setHours(8, 0, 0, 0);
+    if (m.t < +ocho) m.t = +ocho;
+  }
   const primera = (tipo) => ms.find((m) => m.tipo === tipo);
   const ultima = (tipo) => [...ms].reverse().find((m) => m.tipo === tipo);
   const avisos = [];
@@ -57,7 +66,6 @@ export function calcularJornada(marcas, c = CONFIG_DEFECTO) {
   if (noVuelve) avisos.push("No volvió a casa: sin viaje de vuelta");
   if (noSale) avisos.push("No salió de casa: sin viaje de ida");
   const viajeMin = (ida ?? 0) + (vuelta ?? 0);
-  const pago = viajeAPagar(viajeMin, c);
   const tramos = [];
   let abierto = null;
   for (const m of ms) {
@@ -71,7 +79,19 @@ export function calcularJornada(marcas, c = CONFIG_DEFECTO) {
   const presencia = tramos.reduce((s, x) => s + x.min, 0);
   const almuerzo = presencia >= (c.almuerzoDesdeMin ?? 360) ? (c.almuerzoMin ?? 60) : 0;
   const trabajo = presencia - almuerzo;
-  const extra = Math.max(0, presencia - c.jornadaMin);
+  // Horas extra, adicionales por viaje y no trabajadas, con las reglas de la agenda.
+  const excesoViaje = Math.max(0, viajeMin - c.viajeIncluidoMin);
+  const requerido = Math.max(0, c.jornadaMin - (c.beneficioMin || 0));
+  let adicViaje = 0, extras = 0, noTrab = 0;
+  if (tramos.length) {
+    if (presencia >= requerido) { adicViaje = redondeo(excesoViaje); extras = redondeo(presencia - c.jornadaMin); }
+    else {
+      const falta = requerido - presencia;
+      if (excesoViaje >= falta) { adicViaje = redondeo(excesoViaje - falta); if (falta) avisos.push(`El viaje adicional compensa ${falta} min no trabajados`); }
+      else noTrab = -redondeo(falta - excesoViaje);
+    }
+  }
+  const extra = extras * 60;
   const porProyecto = {};
   for (const x of tramos) porProyecto[x.proyectoNombre] = (porProyecto[x.proyectoNombre] || 0) + x.min;
   if (almuerzo && presencia) {
@@ -90,7 +110,7 @@ export function calcularJornada(marcas, c = CONFIG_DEFECTO) {
     kmInicio: kmIni, kmFin, km, patente: salCasa?.patente || llegCasa?.patente || "",
     salidaCasa: salCasa?.t ?? null, llegadaTrabajo: llegTrab?.t ?? null, salidaTrabajo: salTrab?.t ?? null, llegadaCasa: llegCasa?.t ?? null,
     lugar: llegTrab?.lugar || "", lugarSalida: salTrab?.lugar || "",
-    idaMin: ida, vueltaMin: vuelta, viajeMin, viajeExcesoMin: pago.excesoMin, horasViajeExtra: pago.horas,
+    idaMin: ida, vueltaMin: vuelta, viajeMin, viajeExcesoMin: excesoViaje, horasViajeExtra: adicViaje, noTrabajadas: noTrab,
     presenciaMin: presencia, almuerzoMin: almuerzo, trabajoMin: trabajo, extraMin: extra, tramos, porProyecto, avisos,
   };
 }

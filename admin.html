@@ -82,9 +82,10 @@
         <label>Hasta<input id="e-hasta" type="date" required></label>
         <button class="btn prim" type="submit">Ver</button>
         <button class="btn" type="button" id="e-excel">Descargar Excel</button>
+        <button class="btn" type="button" id="e-agenda">Agenda (formato Claudia)</button>
       </form>
       <div id="e-totales" class="numeros"></div>
-      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Hs viaje a pagar</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Proyectos / observaciones</th></tr></thead>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Adic. x viaje</th><th>Trabajadas</th><th>Extras 50%</th><th>No trab.</th><th>Proyectos / observaciones</th></tr></thead>
         <tbody id="e-jornadas"></tbody></table></div>
 
       <h2>Marcas de un día</h2>
@@ -177,17 +178,19 @@
       <label>Empleado<select id="r-empleado"></select></label>
       <button class="btn prim" type="submit">Ver</button>
       <button class="btn" type="button" id="btn-excel">Descargar Excel</button>
+      <button class="btn" type="button" id="btn-agenda">Agenda de horarios (una hoja por persona)</button>
     </form>
+    <p class="nota">La agenda se arma con las mismas columnas que la de Claudia y queda guardada en Dropbox, en la carpeta Horarios. Para el período de pago usá del 21 al 20.</p>
     <div id="resultado" hidden>
       <p id="sin-datos" class="nota" hidden>No hay marcas en ese período.</p>
       <h2>Horas hombre por proyecto</h2>
       <div class="scroll"><table class="tabla"><thead><tr><th>Proyecto</th><th>Total</th><th>Por persona</th></tr></thead>
         <tbody id="tabla-proyectos-horas"></tbody></table></div>
       <h2>Totales por empleado</h2>
-      <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Días</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Viaje total</th><th>Hs viaje a pagar</th></tr></thead>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Empleado</th><th>Días</th><th>Trabajadas</th><th>Extras 50%</th><th>Viaje total</th><th>Adic. x viaje</th><th>No trab.</th></tr></thead>
         <tbody id="tabla-empleados-tot"></tbody></table></div>
       <h2>Jornadas</h2>
-      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Empleado</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Hs viaje a pagar</th><th>Trabajo (sin almuerzo)</th><th>Extra</th><th>Proyectos / observaciones</th></tr></thead>
+      <div class="scroll"><table class="tabla"><thead><tr><th>Fecha</th><th>Empleado</th><th>Salió casa</th><th>Llegó trabajo</th><th>Salió trabajo</th><th>Llegó casa</th><th>Viaje</th><th>Adic. x viaje</th><th>Trabajadas</th><th>Extras 50%</th><th>No trab.</th><th>Proyectos / observaciones</th></tr></thead>
         <tbody id="tabla-jornadas"></tbody></table></div>
     </div>
   </section>
